@@ -1,3 +1,4 @@
+import argparse
 import git
 import github
 
@@ -7,9 +8,7 @@ from pprint import pprint
 
 def read_oauth_token(oauth_token_file):
 	with open(oauth_token_file, 'r') as read_obj:
-		for line in read_obj:
-			token = line.strip()
-			break
+		token = [line.strip() for line in read_obj if '#' not in line[:2]][0]
 	return token
 
 
@@ -28,17 +27,7 @@ def get_repo_urls(repos_info):
 	return {repo.name: repo.html_url for repo in repos_info}
 
 
-def setup_paths(repos_dst=None, token_path=None):
-	if not token_path:
-		oauth_token_file = Path(__file__).parents[2].joinpath('oauth_token_github_org_names.txt')
-	if not repos_dst:
-		repos_dst_path = Path(__file__).parents[2].joinpath('all_tic_repos')
-	else:
-		repos_dst = Path(repos_dst)
-		if repos_dst.is_absolute():
-			repos_dst_path = repos_dst
-		else:
-			repos_dst_path = Path(__file__).parents[2].joinpath(repos_dst)
+def setup_paths(repos_dst_path, oauth_token_file):
 	return oauth_token_file, repos_dst_path
 
 
@@ -67,15 +56,32 @@ def make_dst_path(dst):
 	else:
 		print(f'`{dst.name}` created at `{dst.parent}`')
 
+def get_cli_args():
+	arg_parser = argparse.ArgumentParser(description='Clones all the repositories on The Imaging Collective organization on GitHub',
+	                                     prog='clone_repos.py',
+	                                     usage='py3 %(prog)s destination-containing-directory-path oauth-token-filepath'
+	                                     )
+	arg_parser.add_argument('dst')
+	arg_parser.add_argument('token_file')
+	return arg_parser.parse_args()
 
-def main():
-	oauth_token_file, repo_dir_dst = setup_paths()
+def clone_tic(repo_dir_dst, oauth_token_file):
+	repo_dir_dst = Path(repo_dir_dst)
+	oauth_token_file = Path(oauth_token_file)
 	make_dst_path(repo_dir_dst)
 	token = read_oauth_token(oauth_token_file)
 	orgs_info = get_orgs_info(token)
 	tic_repos = get_org_repos(orgs_info['The Imaging Collective'])
 	repo_urls = get_repo_urls(tic_repos)
 	clone_repos(repo_urls=repo_urls, dst=repo_dir_dst)
+
+
+def main():
+	cli_args = get_cli_args()
+	repo_dir_dst = cli_args.dst
+	oauth_token_file = cli_args.token_file
+	clone_tic(repo_dir_dst, oauth_token_file)
+
 
 
 if __name__ == '__main__':
