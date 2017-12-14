@@ -1,37 +1,42 @@
+# encoding: -*-utf-8 -*-
+#!/usr/bin/env python3
+"""
+Clones all the repos in a GitHub Organization to which the user is a member.
+Requires the members user's GitHub token with read:org scope.
+Accepts path to token file and destination directory.
+"""
+
 import argparse
 import git
 import github
 
 from pathlib import Path
 from pprint import pprint
+from typing import (AnyStr, ByteString, Dict, List, Text, Union,)
 
 
-def read_oauth_token(oauth_token_file):
+def read_oauth_token(oauth_token_file: Union[ByteString, AnyStr]) -> Text:
 	with open(oauth_token_file, 'r') as read_obj:
 		token = [line.strip() for line in read_obj if '#' not in line[:2]][0]
 	return token
 
 
-def get_orgs_info(oauth_token):
+def get_orgs_info(oauth_token: AnyStr) -> Dict[Text, github.Organization]:
 	my_github = github.Github(login_or_token=oauth_token)
 	org_info = {organization.name: organization for organization in my_github.get_user().get_orgs()}
 	return org_info
 
 
-def get_org_repos(org_info):
+def get_org_repos(org_info: Dict[Text, github.Organization]) -> List[github.Repository]:
 	org_repos = org_info.get_repos()
 	return [repo for repo in org_repos]
 
 
-def get_repo_urls(repos_info):
+def get_repo_urls(repos_info: github.Repository) -> Dict[Text, Text]:
 	return {repo.name: repo.html_url for repo in repos_info}
 
 
-def setup_paths(repos_dst_path, oauth_token_file):
-	return oauth_token_file, repos_dst_path
-
-
-def clone_repos(repo_urls, dst):
+def clone_repos(repo_urls: Dict[Text, Text], dst: Union[ByteString, AnyStr]):
 	for repo_name, repo_url in repo_urls.items():
 		repo_url = '.'.join([repo_url, 'git'])
 		repo_dst = dst.joinpath(repo_name)
@@ -42,7 +47,8 @@ def clone_repos(repo_urls, dst):
 		else:
 			print(f'Cloned {repo_url} to {repo_dst}')
 
-def make_dst_path(dst):
+
+def make_dst_path(dst: Union[ByteString, AnyStr]):
 	try:
 		dst.mkdir()
 	except FileExistsError as excep:
@@ -56,7 +62,7 @@ def make_dst_path(dst):
 	else:
 		print(f'`{dst.name}` created at `{dst.parent}`')
 
-def get_cli_args():
+def get_cli_args() -> argparse.ArgumentParser.parse_args:
 	arg_parser = argparse.ArgumentParser(description='Clones all the repositories on The Imaging Collective organization on GitHub',
 	                                     prog='clone_repos.py',
 	                                     usage='py3 %(prog)s destination-containing-directory-path oauth-token-filepath'
@@ -65,7 +71,7 @@ def get_cli_args():
 	arg_parser.add_argument('token_file')
 	return arg_parser.parse_args()
 
-def clone_tic(repo_dir_dst, oauth_token_file):
+def clone_tic(repo_dir_dst: Union[ByteString, AnyStr], oauth_token_file: Union[ByteString, AnyStr]):
 	repo_dir_dst = Path(repo_dir_dst)
 	oauth_token_file = Path(oauth_token_file)
 	make_dst_path(repo_dir_dst)
