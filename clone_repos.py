@@ -1,5 +1,5 @@
 # encoding: -*-utf-8 -*-
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 """
 Clones all the repos in a GitHub Organization to which the user is a member.
 Requires the members user's GitHub token with read:org scope.
@@ -12,7 +12,13 @@ import github
 
 from pathlib import Path
 from pprint import pprint
-from typing import (AnyStr, ByteString, Dict, List, Text, Union,)
+from typing import (AnyStr,
+                    ByteString,
+                    Dict,
+                    List,
+                    Text,
+                    Union,
+                    )
 
 
 def read_oauth_token(oauth_token_file: Union[ByteString, AnyStr]) -> Text:
@@ -87,7 +93,6 @@ def main():
 	repo_dir_dst = cli_args.dst
 	oauth_token_file = cli_args.token_file
 	clone_tic(repo_dir_dst, oauth_token_file)
-
 
 
 if __name__ == '__main__':
