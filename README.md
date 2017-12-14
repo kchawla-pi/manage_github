@@ -15,7 +15,7 @@ Steps to obtain the token:
 7. In `Select scopes`, go to the section for `admin: org`.  
 8. Check mark enable the `read: org` permission, leave the rest unchecked.  
 9. Click on `Generate Token`.
-10. Copy and paste the new token into a text file. Save it at a convenient location for you intended backup directory.
+10. Copy and paste the new token into a text file. Save it at a convenient location for you intended backup directory. Lines preceded with a `#` are considered to be comments.
 11. Do not share the token casually.
 
 To run type:
