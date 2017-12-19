@@ -1,4 +1,4 @@
-# encoding: -*-utf-8 -*-
+# -*- encoding: utf-8 -*-
 # !/usr/bin/env python3
 """
 Clones all the repos in a GitHub Organization to which the user is a member.
@@ -19,9 +19,11 @@ from typing import (AnyStr,
                     List,
                     Text,
                     Union,
+                    NewType,
                     )
 
-
+GitHubOrganization = NewType('GitHubOrganization', github.Organization)
+GitHubRepository = NewType('GitHubRepository', github.Repository)
 def read_oauth_token(oauth_token_file: Union[ByteString, AnyStr]) -> Text:
 	""" Reads and returns the OAuth Token from the supplied text file.
 	"""
@@ -30,7 +32,7 @@ def read_oauth_token(oauth_token_file: Union[ByteString, AnyStr]) -> Text:
 	return token
 
 
-def get_orgs_info(oauth_token: AnyStr) -> Dict[Text, github.Organization]:
+def get_orgs_info(oauth_token: AnyStr) -> Dict[Text, GitHubOrganization]:
 	""" Takes a GitHub user's OAuth token and returns dict of their GitHub Organization names and objects.
 	"""
 	my_github = github.Github(login_or_token=oauth_token)
@@ -38,7 +40,7 @@ def get_orgs_info(oauth_token: AnyStr) -> Dict[Text, github.Organization]:
 	return org_info
 
 
-def _get_org_repos(org_info: Dict[Text, github.Organization]) -> List[github.Repository]:
+def _get_org_repos(org_info: Dict[Text, GitHubOrganization]) -> List[GitHubRepository]:
 	""" Returns the list of GitHub Repository objects of the user's GitHub organization.
 	Accepts a dict of GitHub Organization name and object.
 	"""
@@ -46,7 +48,7 @@ def _get_org_repos(org_info: Dict[Text, github.Organization]) -> List[github.Rep
 	return [repo for repo in org_repos]
 
 
-def _get_repo_urls(repos_info: Iterator[github.Repository]) -> Dict[Text, Text]:
+def _get_repo_urls(repos_info: Iterator[GitHubRepository]) -> Dict[Text, Text]:
 	""" Accepts GitHub Repository objects and returns dict of repository name and HTML url.
 	"""
 	return {repo.name: repo.html_url for repo in repos_info}
