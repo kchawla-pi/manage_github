@@ -24,6 +24,8 @@ from typing import (AnyStr,
 
 GitHubOrganization = NewType('GitHubOrganization', github.Organization)
 GitHubRepository = NewType('GitHubRepository', github.Repository)
+
+
 def read_oauth_token(oauth_token_file: Union[ByteString, AnyStr]) -> Text:
 	""" Reads and returns the OAuth Token from the supplied text file.
 	"""
