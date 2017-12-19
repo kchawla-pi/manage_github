@@ -7,8 +7,8 @@ Accepts path to token file and destination directory.
 """
 
 import argparse
-import git
-import github
+import git  # pip install gitpython
+import github  # pip install PyGithub
 
 from pathlib import Path
 from pprint import pprint
