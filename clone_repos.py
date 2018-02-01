@@ -117,6 +117,24 @@ def clone_org_repos(repo_dir_dst: Union[ByteString, AnyStr], oauth_token_file: U
 	_clone_repos(repo_urls=repo_urls, dst=repo_dir_dst)
 
 
+def delete_org_repos(oauth_token_file: Union[ByteString, AnyStr],
+                    org_name: Text):
+	oauth_token_file = Path(oauth_token_file)
+	token = read_oauth_token(oauth_token_file)
+	orgs_info = get_orgs_info(token)
+	tic_repos = _get_org_repos(orgs_info[org_name])
+	
+	test_repos = tic_repos[-2:]
+	
+	print()
+
+
+def make_root_path():
+	root_file_parts = Path(__file__).parts
+	root_part_idx = root_file_parts.index('workspace')
+	root_path = Path(*root_file_parts[:root_part_idx + 1])
+	return root_path
+
 def main():
 	cli_args = _get_cli_args()
 	repo_dir_dst = cli_args.dst
@@ -125,4 +143,7 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+	root_path = make_root_path()
+	repo_delete_token_filepath = root_path.joinpath('oauth_token_github_delete_repos.txt')
+	org_read_token_filepath = root_path.joinpath('oauth_token_github_org_names.txt')
+	delete_org_repos(oauth_token_file=org_read_token_filepath, org_name='The Imaging Collective')
