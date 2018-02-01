@@ -117,17 +117,15 @@ def clone_org_repos(repo_dir_dst: Union[ByteString, AnyStr], oauth_token_file: U
 	_clone_repos(repo_urls=repo_urls, dst=repo_dir_dst)
 
 
-def delete_org_repos(oauth_token_file: Union[ByteString, AnyStr],
-                    org_name: Text):
+def filter_org_repos(repo_list, oauth_token_file: Union[ByteString, AnyStr],
+                     org_name: Text):
 	oauth_token_file = Path(oauth_token_file)
 	token = read_oauth_token(oauth_token_file)
 	orgs_info = get_orgs_info(token)
 	tic_repos = _get_org_repos(orgs_info[org_name])
-	
-	test_repos = tic_repos[-2:]
+	return [repo for repo in tic_repos if repo.full_name.split('/')[-1] in repo_list]
 	
 	print()
-
 
 def make_root_path():
 	root_file_parts = Path(__file__).parts
@@ -135,15 +133,29 @@ def make_root_path():
 	root_path = Path(*root_file_parts[:root_part_idx + 1])
 	return root_path
 
-def main():
+def clone_cli():
 	cli_args = _get_cli_args()
 	repo_dir_dst = cli_args.dst
 	oauth_token_file = cli_args.token_file
 	clone_org_repos(repo_dir_dst, oauth_token_file, org_name='The Imaging Collective')
+	
 
-
-if __name__ == '__main__':
+def backup_and_delete():
 	root_path = make_root_path()
 	repo_delete_token_filepath = root_path.joinpath('oauth_token_github_delete_repos.txt')
 	org_read_token_filepath = root_path.joinpath('oauth_token_github_org_names.txt')
-	delete_org_repos(oauth_token_file=org_read_token_filepath, org_name='The Imaging Collective')
+	org_repo_clone_path = root_path.joinpath('tic', 'tic_backup_before_delete')
+	
+	# clone_org_repos(repo_dir_dst=org_repo_clone_path, oauth_token_file=org_read_token_filepath, org_name='The Imaging Collective')
+	
+	repo_list = Path('~', 'Downloads', 'tic_cleanup.txt').expanduser().read_text().split('\n')
+	delete_repos_list = filter_org_repos(repo_list, oauth_token_file=repo_delete_token_filepath, org_name='The Imaging Collective')
+	[repo.delete() for repo in delete_repos_list]
+	
+	
+def main():
+	backup_and_delete()
+
+
+if __name__ == '__main__':
+	main()
