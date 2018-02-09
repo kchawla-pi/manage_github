@@ -1,5 +1,6 @@
 # manage_git README
-Repo with programs to manage the TIC organization on GitHub
+Originally, this was a repo with programs written to manage the TIC organization on GitHub (https://github.com/theimagingcollective/).  
+Now it will be adopted to manage any github user/organization in general.
 
 clone_repos.py requires a GitHUb OAuth Token for the user who wishes to clone the repos of any organzation they are a member of.
 The token can be obtained from User's Settings on Github.com
